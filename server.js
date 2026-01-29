@@ -1,27 +1,29 @@
 const express = require('express');
 const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
 const bodyParser = require('body-parser');
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const sqlite3 = require('sqlite3').verbose();
-const bcrypt = require('bcryptjs');
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(session({
+  store: new SQLiteStore({ db: 'sessions.sqlite', dir: __dirname }),
   secret: 'gazake-secret-proto',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 }
+  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
 }));
 
-// Serve static files (HTML, CSS, JS)
+// Serve static site
 app.use(express.static(path.join(__dirname)));
 
-// SQLite DB
+// Setup DB
 const DB_PATH = path.join(__dirname, 'database.sqlite');
 const db = new sqlite3.Database(DB_PATH, (err) => {
   if (err) return console.error('DB open error', err);
@@ -37,7 +39,7 @@ db.serialize(() => {
   )`);
 });
 
-// API: create account (with hashed password)
+// Signup
 app.post('/api/signup', (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) return res.status(400).json({ error: 'Campos faltando' });
@@ -52,7 +54,7 @@ app.post('/api/signup', (req, res) => {
   });
 });
 
-// API: login
+// Login
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Campos faltando' });
@@ -66,13 +68,13 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// API: current user
+// Current user
 app.get('/api/me', (req, res) => {
   if (req.session && req.session.user) return res.json({ user: req.session.user });
   return res.json({ user: null });
 });
 
-// API: logout
+// Logout
 app.post('/api/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).json({ error: 'Erro ao sair' });

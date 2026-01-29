@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
 
-  // Notification helper (toast)
+  // Toast helper
   function ensureNotifContainer() {
     let c = document.getElementById('gb-notifications');
     if (!c) {
@@ -12,8 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return c;
   }
-
-  function showNotification(message, type = 'info', timeout = 4000) {
+  function showNotification(message, type = 'info', timeout = 3500) {
     const container = ensureNotifContainer();
     const n = document.createElement('div');
     n.className = `gb-notif gb-notif-${type}`;
@@ -21,9 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     container.appendChild(n);
     const remove = () => n.classList.add('gb-notif-hide');
     n.querySelector('.gb-notif-close').addEventListener('click', () => remove());
-    // auto remove
     setTimeout(() => remove(), timeout);
-    // remove from DOM after animation
     n.addEventListener('transitionend', () => { if (n.parentNode) n.parentNode.removeChild(n); });
   }
 
@@ -39,23 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
     location.href = 'login.html';
   }
 
-  // Se estiver na home, verifica sessão no servidor
   (async () => {
     const path = location.pathname;
     const file = path.substring(path.lastIndexOf('/') + 1);
     const me = await getMe();
-    if ((file === '' || file === 'index.html') && !me.user) {
-      location.href = 'login.html';
-      return;
-    }
-
+    if ((file === '' || file === 'index.html') && !me.user) { location.href = 'login.html'; return; }
     const nav = document.querySelector('header nav');
-    if (nav) {
-      if (me.user) {
-        nav.innerHTML = `<a href="index.html">Home</a><a href="#" id="logoutBtn" class="btn">Sair (${me.user.email})</a>`;
-        const btn = document.getElementById('logoutBtn');
-        if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); doLogout(); });
-      }
+    if (nav && me.user) {
+      nav.innerHTML = `<a href="index.html">Home</a><a href="#" id="logoutBtn" class="btn">Sair (${me.user.email})</a>`;
+      const btn = document.getElementById('logoutBtn'); if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); doLogout(); });
     }
   })();
 
@@ -65,10 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = loginForm.email.value.trim();
       const pass = loginForm.password.value.trim();
       if (!email || !pass) { showNotification('Preencha email e senha.', 'error'); return; }
-      const res = await fetch('/api/login', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: pass })
-      });
+      const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: pass }) });
       const body = await res.json();
       if (!res.ok) return showNotification(body.error || 'Erro no login', 'error');
       location.href = 'index.html';
@@ -84,14 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const confirm = signupForm.confirm.value.trim();
       if (!name || !email || !pass || !confirm) { showNotification('Preencha todos os campos.', 'error'); return; }
       if (pass !== confirm) { showNotification('As senhas não coincidem.', 'error'); return; }
-      const res = await fetch('/api/signup', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password: pass })
-      });
+      const res = await fetch('/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password: pass }) });
       const body = await res.json();
       if (!res.ok) return showNotification(body.error || 'Erro no cadastro', 'error');
       showNotification('Conta criada com sucesso. Faça login.', 'success');
-      location.href = 'login.html';
+      setTimeout(() => location.href = 'login.html', 900);
     });
   }
 });

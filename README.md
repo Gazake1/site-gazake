@@ -1,26 +1,19 @@
 # Gazake Bots — Protótipo
 
-Pequeno protótipo com 3 telas: `index.html`, `login.html`, `signup.html`.
+Protótipo com telas `index.html`, `login.html`, `signup.html` e servidor Node.js com SQLite para persistência.
 
-Para abrir localmente, abra `index.html` no navegador ou rode um servidor simples (recomendado):
-
-```powershell
-python -m http.server 8000
-```
-
-Depois acesse http://localhost:8000
-
-Ou rode com Node.js (recomendado para sessão e APIs):
+Rodar localmente (Node.js):
 
 ```powershell
+cd "c:\Users\tanji\OneDrive\Desktop\meu-site-login"
 npm install
 npm start
 ```
 
-Depois acesse http://localhost:3000
+Abra http://localhost:3000
 
 Banco de dados:
-- O servidor criará `database.sqlite` na raiz do projeto automaticamente.
-- Para limpar os dados, remova o arquivo `database.sqlite`.
+- `database.sqlite` será criado na raiz para usuários.
+- `sessions.sqlite` será criado para armazenar sessões (persistem entre reinícios do servidor).
 
-Nota: este é um protótipo — senhas são armazenadas com hash, mas não há migrações avançadas nem backups.
+Nota: este é um protótipo — senhas são guardadas com hash (`bcryptjs`) mas não há migrações avançadas.

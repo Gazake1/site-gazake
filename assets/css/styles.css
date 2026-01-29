@@ -28,13 +28,6 @@
 
   --grad-accent: linear-gradient(180deg, rgba(197,30,48,1) 0%, rgba(151,16,31,1) 100%);
   --grad-card: linear-gradient(180deg, rgba(16,16,26,.92) 0%, rgba(12,12,20,.92) 100%);
-  /* Background image controls */
-  --bg-left-opacity: 0.45;
-  --bg-right-opacity: 0.28;
-  --bg-left-blur: 20px;
-  --bg-right-blur: 24px;
-  --bg-left-mode: overlay;
-  --bg-right-mode: multiply;
 }
 
 *{box-sizing:border-box}
@@ -50,39 +43,6 @@ body{
     linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 100%);
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
-}
-
-/* Decorative translucent SVGs as background layers */
-body::before,
-body::after{
-  content: "";
-  position: fixed;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Single full-screen decorative background using user's images.jpg */
-body::before{
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: url('/img/images.jpg');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center center;
-  opacity: 0.36;
-  filter: blur(18px) saturate(.9);
-  mix-blend-mode: overlay;
-}
-
-/* remove secondary decorative layer */
-body::after{ display: none; }
-
-/* Ensure main content sits above decorative layers */
-header, main, footer, .container, .site-header, .form-card, .card{
-  position: relative;
-  z-index: 1;
 }
 
 /* Seleção de texto */
